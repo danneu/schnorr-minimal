@@ -116,6 +116,23 @@ export function bufferFromBigInt(n: bigint): Uint8Array {
     return buf
 }
 
+export function concatBuffers(...buffs: Uint8Array[]) {
+    let totalSize = 0
+    for (let i = 0; i < buffs.length; i++) {
+        assert(buffs[i] instanceof Uint8Array)
+        totalSize += buffs[i].length
+    }
+
+    const res = new Uint8Array(totalSize)
+    let writeAt = 0
+    for (let i = 0; i < buffs.length; i++) {
+        res.set(buffs[i], writeAt)
+        writeAt += buffs[i].length
+    }
+
+    return res
+}
+
 // 33 bytes: // first byte represents y, next 32 bytes are x coord
 export function pointFromBuffer(buf: Uint8Array): Point {
     if (buf.length !== 33) {

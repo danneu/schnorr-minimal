@@ -21,6 +21,11 @@ export function add(a: Point, b: Point): Point {
     return fastAdd(a, b)
 }
 
+export function subtract(a: Point, b: Point): Point {
+    b = { x: b.x, y: (curve.p - b.y) % curve.p }
+    return add(a, b)
+}
+
 export function multiply(point: Point, scalar: bigint): Point {
     scalar = scalar % curve.n
     return fastMultiply(point, scalar)
