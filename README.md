@@ -10,7 +10,6 @@
 ## Plans
 
 -   Migrate from bigint to uint8array internally.
--   Add optimizations.
 
 ## Usage
 

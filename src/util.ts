@@ -31,7 +31,7 @@ export function powmod(base: bigint, exp: bigint, m: bigint): bigint {
     }
 }
 
-function modInverse(a: bigint, m: bigint): bigint {
+export function modInverse(a: bigint, m: bigint): bigint {
     if (a < 0 || m <= a) {
         a = mod(a, m)
     }
