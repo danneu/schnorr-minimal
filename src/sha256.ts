@@ -379,7 +379,7 @@ class HMAC {
 }
 
 // Returns SHA256 hash of data.
-export default function hash(data: Uint8Array): Uint8Array {
+export function hash(data: Uint8Array): Uint8Array {
     const h = new Hash().update(data)
     const digest = h.digest()
     h.clean()
@@ -387,8 +387,18 @@ export default function hash(data: Uint8Array): Uint8Array {
 }
 
 // Returns HMAC-SHA256 of data under the key.
-function hmac(key: Uint8Array, data: Uint8Array) {
-    const h = new HMAC(key).update(data)
+// function hmac(key: Uint8Array, data: Uint8Array) {
+//     const h = new HMAC(key).update(data)
+//     const digest = h.digest()
+//     h.clean()
+//     return digest
+// }
+
+export function hmac(key: Uint8Array, inputs: Uint8Array[]) {
+    const h = new HMAC(key)
+    for (const input of inputs) {
+        h.update(input)
+    }
     const digest = h.digest()
     h.clean()
     return digest

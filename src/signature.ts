@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import { secp256k1 as curve, powmod, pointFromBuffer } from './util'
 import { concatBuffers as concat, bufferToBigInt as int, pointToBuffer, bufferFromBigInt } from './util'
 import * as ec from './elliptic'
-import hash from './sha256'
+import { hash } from './sha256'
 
 // Schnorr Signatures
 //
@@ -12,7 +12,7 @@ function jacobi(x: bigint): bigint {
     return powmod(x, (curve.p - 1n) / 2n, curve.p)
 }
 
-export function sign(message: Uint8Array, secret: bigint) {
+export function sign(message: Uint8Array, secret: bigint): Uint8Array {
     const m = message
     const d = secret
     assert.strictEqual(m.length, 32)

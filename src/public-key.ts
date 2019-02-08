@@ -17,6 +17,11 @@ export default class PublicKey {
         return new PublicKey(util.pointFromBuffer(buf))
     }
 
+    static _fromPoint(point: Point): PublicKey {
+        // TODO: Ensure point is on curve
+        return new PublicKey(point)
+    }
+
     static combine(keys: Array<PublicKey>): PublicKey {
         if (keys.length === 0) {
             throw new Error('must combine at least one public key (array was empty)')

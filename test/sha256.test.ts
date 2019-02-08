@@ -1,7 +1,9 @@
 import 'mocha'
 import * as assert from 'assert'
-import hash from '../src/sha256'
+import { hash } from '../src/sha256'
 import { bufferToHex as hex } from '../src/util'
+
+// TODO: test hmac
 
 describe('sha256', () => {
     it('hashes empty input', () => {

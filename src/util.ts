@@ -187,3 +187,7 @@ export function constantTimeBufferEquals(a: Uint8Array, b: Uint8Array): boolean 
 
     return result === 0
 }
+
+export function utf8ToBuffer(text: string): Uint8Array {
+    return new TextEncoder().encode(text)
+}
