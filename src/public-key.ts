@@ -32,7 +32,7 @@ export default class PublicKey {
     }
 
     private constructor(point: Point) {
-        // TODO: Validate that point is on curve here instea of on point decode.
+        // Point must already be validated that it's on the curve at this point.
         this._point = point
     }
 

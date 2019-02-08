@@ -13,7 +13,7 @@ export default class PrivateKey {
 
     private constructor(scalar: bigint) {
         // Centralize validation here so that we cannot create invalid privkeys
-        if (scalar <= 0n || scalar > util.secp256k1.n) {
+        if (scalar <= 0n || scalar >= util.secp256k1.n) {
             throw new Error('invalid privkey')
         }
 
