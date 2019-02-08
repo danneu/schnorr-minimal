@@ -69,7 +69,7 @@ describe('PublicKey', () => {
                     0x027aca48b354b794eab5c3a74df8f92e79d93d3d87a1ee3555adb5c9b2852fe20dn,
                 ],
             ].forEach(([privScalar, pub]) => {
-                const priv = PrivateKey.fromBigInt(privScalar)
+                const priv = PrivateKey._fromBigInt(privScalar)
                 const actual = util.bufferToBigInt(PublicKey.fromPrivateKey(priv).toBuffer())
                 assert.strictEqual(actual, pub)
             })
@@ -136,7 +136,7 @@ describe('PublicKey', () => {
             }
 
             for (const { k, x, y } of fixtures) {
-                const privkey = PrivateKey.fromBigInt(k)
+                const privkey = PrivateKey._fromBigInt(k)
                 const pubkey = PublicKey.fromPrivateKey(privkey)
                 assert.deepStrictEqual(pubkey._point, { x, y }, `k=${k}`)
             }

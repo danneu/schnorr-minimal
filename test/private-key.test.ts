@@ -28,6 +28,6 @@ describe('PrivateKey', () => {
 
     it('cannot exceed curve order', () => {
         const scalar = util.secp256k1.n + 1n
-        assert.throws(() => PrivateKey.fromBigInt(scalar), /invalid privkey/)
+        assert.throws(() => PrivateKey._fromBigInt(scalar), /invalid privkey/)
     })
 })

@@ -7,7 +7,7 @@ export default class PrivateKey {
         return new PrivateKey(util.bufferToBigInt(buf))
     }
 
-    static fromBigInt(scalar: bigint): PrivateKey {
+    static _fromBigInt(scalar: bigint): PrivateKey {
         return new PrivateKey(scalar)
     }
 
