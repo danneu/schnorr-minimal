@@ -2,7 +2,12 @@
 
 A simple but naive implementation. Use at your own risk.
 
-## Goals:
+## Features
+
+-   [Standardized](https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki) Schnorr signatures
+-   Blind signatures
+
+## Goals
 
 1. **Zero dependencies**
 2. **Works in web browsers** https://caniuse.com/#search=bigint
