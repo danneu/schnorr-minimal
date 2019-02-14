@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import { secp256k1 as curve, powmod, pointFromBuffer } from './util'
+import { secp256k1 as curve, powmod, pointFromBuffer, bufferToHex } from './util'
 import { jacobi, concatBuffers as concat, bufferToBigInt as int, pointToBuffer, bufferFromBigInt } from './util'
 import { pointMultiply, pointSubtract, INFINITE_POINT } from './elliptic'
 import { hash } from './sha256'
@@ -22,6 +22,9 @@ export const Signature = {
     },
     toBytes({ r, s }: Signature): Uint8Array {
         return concat(bufferFromBigInt(r), bufferFromBigInt(s))
+    },
+    toHex(sig: Signature): string {
+        return bufferToHex(Signature.toBytes(sig))
     },
 }
 
