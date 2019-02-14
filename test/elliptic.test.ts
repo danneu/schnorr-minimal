@@ -1,7 +1,7 @@
 import 'mocha'
 import * as assert from 'assert'
 import * as util from '../src/util'
-import { INFINITE_POINT, add, multiply } from '../src/elliptic'
+import { INFINITE_POINT, pointAdd as add, pointMultiply as multiply } from '../src/elliptic'
 import { randomFillSync } from 'crypto'
 
 describe('elliptic', () => {

@@ -1,5 +1,7 @@
 # secp256k1-minimal
 
+A simple but naive implementation. Use at your own risk.
+
 ## Goals:
 
 1. **Zero dependencies**
@@ -12,10 +14,9 @@
 ## Usage
 
 ```javascript
-import { PrivateKey, PublicKey } from 'secp256k1-minimal'
+import { Scalar, Point } from 'secp256k1-minimal'
 
-const scalar = new Uint8Array('0xe47d79c74106dbc026a8e672ced54c3f23c7a001a2ef9318be3f338db4edba2d')
-const priv = PrivateKey.fromBuffer(scalar)
-const pub = PublicKey.fromPrivateKey(priv)
-assert(toHexString(pub.toBuffer()) === '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798')
+const priv = Scalar.fromHex('0xe47d79c74106dbc026a8e672ced54c3f23c7a001a2ef9318be3f338db4edba2d')
+const pub = Point.fromPrivKey(priv)
+assert(toHexString(Point.toBytes(pub) === '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798')
 ```

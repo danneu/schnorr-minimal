@@ -218,3 +218,7 @@ export function isPointOnCurve({ x, y }: Point): boolean {
     const { p, a, b } = secp256k1
     return (y * y - (x * x * x + a * x + b)) % p === 0n
 }
+
+export function jacobi(y: bigint): bigint {
+    return powmod(y, (secp256k1.p - 1n) / 2n, secp256k1.p)
+}

@@ -1,11 +1,46 @@
-import { mod, powmod, modInverse, secp256k1 as curve } from './util'
+import {
+    mod,
+    powmod,
+    secp256k1 as curve,
+    bufferFromBigInt,
+    bufferToBigInt,
+    pointFromBuffer,
+    pointToBuffer,
+    bufferFromHex,
+} from './util'
 import * as assert from 'assert'
 
 const P = curve.p
 
+export type Scalar = bigint
+
+export const Scalar = {
+    fromBytes(buf: Uint8Array): Scalar {
+        return bufferToBigInt(buf)
+    },
+    toBytes(n: Scalar): Uint8Array {
+        return bufferFromBigInt(n)
+    },
+}
+
 export interface Point {
     readonly x: bigint
     readonly y: bigint
+}
+
+export const Point = {
+    fromPrivKey(privkey: Scalar): Point {
+        return pointMultiply(curve.g, privkey)
+    },
+    fromBytes(buf: Uint8Array): Point {
+        return pointFromBuffer(buf)
+    },
+    fromHex(hex: string): Point {
+        return Point.fromBytes(bufferFromHex(hex))
+    },
+    toBytes(point: Point): Uint8Array {
+        return pointToBuffer(point)
+    },
 }
 
 export const INFINITE_POINT: Point = new class {
@@ -18,11 +53,21 @@ export const INFINITE_POINT: Point = new class {
     }
 }()
 
+// SCALAR MATH
+
+export function scalarAdd(a: Scalar, b: Scalar): Scalar {
+    return (a + b) % curve.n
+}
+
+export function scalarMultiply(a: Scalar, b: Scalar): Scalar {
+    return (a * b) % curve.n
+}
+
 // export function add(a: Point, b: Point): Point {
 //     return fastAdd(a, b)
 // }
 
-export function add(...points: Point[]): Point {
+export function pointAdd(...points: Point[]): Point {
     assert(points.length > 1)
     let point = points[0]
     for (let i = 1; i < points.length; i++) {
@@ -31,12 +76,12 @@ export function add(...points: Point[]): Point {
     return point
 }
 
-export function subtract(a: Point, b: Point): Point {
+export function pointSubtract(a: Point, b: Point): Point {
     b = { x: b.x, y: (curve.p - b.y) % curve.p }
-    return add(a, b)
+    return pointAdd(a, b)
 }
 
-export function multiply(point: Point, scalar: bigint): Point {
+export function pointMultiply(point: Point, scalar: bigint): Point {
     scalar = scalar % curve.n
     return fastMultiply(point, scalar)
 }

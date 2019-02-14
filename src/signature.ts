@@ -1,38 +1,28 @@
 import * as assert from 'assert'
 import { secp256k1 as curve, powmod, pointFromBuffer } from './util'
-import { concatBuffers as concat, bufferToBigInt as int, pointToBuffer, bufferFromBigInt } from './util'
-import * as ec from './elliptic'
+import { jacobi, concatBuffers as concat, bufferToBigInt as int, pointToBuffer, bufferFromBigInt } from './util'
+import { pointMultiply, pointSubtract, INFINITE_POINT } from './elliptic'
 import { hash } from './sha256'
 
 // Schnorr Signatures
 //
 // https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki
 
-function jacobi(y: bigint): bigint {
-    return powmod(y, (curve.p - 1n) / 2n, curve.p)
-}
-
-export class Signature {
+export type Signature = {
     r: bigint // i.e. R.x
     s: bigint
+}
 
-    static fromBuffer(buf: Uint8Array): Signature {
+export const Signature = {
+    fromBytes(buf: Uint8Array): Signature {
         assert(buf.length === 64, 'encoded signature must be 64 bytes')
         const r = int(buf.slice(0, 32))
         const s = int(buf.slice(32, 64))
-        return new Signature(r, s)
-    }
-
-    constructor(r: bigint, s: bigint) {
-        // assert(r < curve.p, 'r must be < curve.p')
-        // assert(s < curve.n, 's must be < curve.n')
-        this.r = r
-        this.s = s
-    }
-
-    toBuffer(): Uint8Array {
-        return concat(bufferFromBigInt(this.r), bufferFromBigInt(this.s))
-    }
+        return { r, s }
+    },
+    toBytes({ r, s }: Signature): Uint8Array {
+        return concat(bufferFromBigInt(r), bufferFromBigInt(s))
+    },
 }
 
 export function sign(message: Uint8Array, secret: bigint): Signature {
@@ -46,18 +36,16 @@ export function sign(message: Uint8Array, secret: bigint): Signature {
     if (k0 === 0n) {
         throw new Error('sig failed')
     }
-    const R = ec.multiply(curve.g, k0)
+    const R = pointMultiply(curve.g, k0)
 
     // nonce
     const k = jacobi(R.y) === 1n ? k0 : curve.n - k0
 
     // challenge
-    const e = int(hash(concat(bufferFromBigInt(R.x), pointToBuffer(ec.multiply(curve.g, d)), m))) % curve.n
+    const e = int(hash(concat(bufferFromBigInt(R.x), pointToBuffer(pointMultiply(curve.g, d)), m))) % curve.n
 
-    // const sig = concat(bufferFromBigInt(R.x), bufferFromBigInt((k + e * d) % curve.n))
-    // return sig
     const s = (k + e * d) % curve.n
-    const sig = new Signature(R.x, s)
+    const sig = { r: R.x, s }
     return sig
 }
 
@@ -80,7 +68,7 @@ export function verify(pubkey: Uint8Array, message: Uint8Array, sig: Signature):
 
     const { r, s } = sig
 
-    // TODO: Should fail upon sig construction instead?
+    // TODO: Centralize validation
     if (r >= curve.p) {
         return false
     }
@@ -90,15 +78,13 @@ export function verify(pubkey: Uint8Array, message: Uint8Array, sig: Signature):
     }
 
     const e = int(hash(concat(bufferFromBigInt(r), pointToBuffer(P), m))) % curve.n
-    const R = ec.subtract(ec.multiply(curve.g, s), ec.multiply(P, e))
+    const R = pointSubtract(pointMultiply(curve.g, s), pointMultiply(P, e))
 
-    if (R === ec.INFINITE_POINT) {
+    if (R === INFINITE_POINT) {
         return false
     } else if (jacobi(R.y) !== 1n) {
-        console.log('verify false. reason: jacobi(R.y) !== 1n')
         return false
     } else if (R.x !== r) {
-        console.log('verify false. reason: R.x !== r')
         return false
     } else {
         return true

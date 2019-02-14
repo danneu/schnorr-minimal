@@ -1,17 +1,14 @@
-import * as ec from '../src/elliptic'
-import { hash } from '../src/sha256'
-import { powmod, secp256k1 as curve, utf8ToBuffer, bufferToBigInt } from '../src/util'
-import { unblind, blindSign, blindMessage } from '../src/blind'
-import { verify } from '../src/signature'
-import PublicKey from '../src/public-key'
 import * as assert from 'assert'
+import { hash } from '../src/sha256'
+import { secp256k1 as curve, utf8ToBuffer, bufferToBigInt } from '../src/util'
+import { Point, verify, blindMessage, blindSign, unblind } from '../src'
 
 function verifyTest(): boolean {
     const secretSeed = randomScalar()
     const noncePriv = randomScalar()
     const signerPriv = randomScalar()
-    const noncePub = ec.multiply(curve.g, noncePriv)
-    const signerPub = ec.multiply(curve.g, signerPriv)
+    const noncePub = Point.fromPrivKey(noncePriv)
+    const signerPub = Point.fromPrivKey(signerPriv)
     const message = hash(utf8ToBuffer('hello my name is foo and this is a message'))
 
     // blind
@@ -24,7 +21,7 @@ function verifyTest(): boolean {
     const sig = unblind(unblinder, blindedSig)
 
     // verify
-    const verified = verify(PublicKey._fromPoint(signerPub).toBuffer(), message, sig)
+    const verified = verify(Point.toBytes(signerPub), message, sig)
 
     return verified
 }

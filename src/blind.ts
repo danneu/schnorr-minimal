@@ -1,4 +1,4 @@
-import { Point, multiply as mul, add, subtract } from './elliptic'
+import { Point, pointMultiply as mul, pointAdd as add, scalarAdd, scalarMultiply } from './elliptic'
 import { Signature } from './signature'
 import * as assert from 'assert'
 import {
@@ -7,38 +7,14 @@ import {
     secp256k1 as curve,
     bufferToBigInt,
     bufferFromBigInt,
-    powmod,
+    jacobi,
     pointToBuffer,
 } from './util'
 import { hash, hmac } from './sha256'
 
-export class BlindedMessage {
-    challenge: bigint
-
-    constructor(challenge: bigint) {
-        this.challenge = challenge
-    }
-}
-
-export class Unblinder {
-    alpha: bigint
-    r: bigint // R.x
-
-    constructor(alpha: bigint, r: bigint) {
-        this.alpha = alpha
-        this.r = r
-    }
-}
-
-export class BlindedSignature {
-    s: bigint
-
-    constructor(s: bigint) {
-        this.s = s
-    }
-}
-
-const G = curve.g
+export type BlindedMessage = { c: bigint /* c = challenge */ }
+export type Unblinder = { alpha: bigint; r: bigint /* R.x */ }
+export type BlindedSignature = { s: bigint }
 
 export function blindMessage(
     secret: bigint,
@@ -46,6 +22,7 @@ export function blindMessage(
     signer: Point,
     message: Uint8Array
 ): [Unblinder, BlindedMessage] {
+    assert.strictEqual(message.length, 32, 'message must have 32 length')
     const R = nonce
     const P = signer
 
@@ -68,7 +45,7 @@ export function blindMessage(
             ])
         )
 
-        RPrime = add(R, mul(G, alpha), mul(P, beta))
+        RPrime = add(R, mul(curve.g, alpha), mul(P, beta))
 
         if (jacobi(RPrime.y) === 1n) {
             break
@@ -83,33 +60,18 @@ export function blindMessage(
     // the blinded challenge
     const c = scalarAdd(cPrime, beta)
 
-    return [new Unblinder(alpha, RPrime.x), new BlindedMessage(c)]
+    return [{ alpha, r: RPrime.x }, { c }]
 }
 
-export function blindSign(signer: bigint, nonce: bigint, blindedMessage: BlindedMessage): BlindedSignature {
-    const c = blindedMessage.challenge
+export function blindSign(signer: bigint, nonce: bigint, { c }: BlindedMessage): BlindedSignature {
     const x = signer
     const k = nonce
 
     const s = scalarAdd(k, scalarMultiply(c, x))
-    return new BlindedSignature(s)
+    return { s }
 }
 
 export function unblind({ alpha, r }: Unblinder, blindedSig: BlindedSignature): Signature {
     let s = scalarAdd(blindedSig.s, alpha)
-    return new Signature(r, s)
-}
-
-// TEMP FUNCTIONS -- will be removed
-
-function jacobi(y: bigint): bigint {
-    return powmod(y, (curve.p - 1n) / 2n, curve.p)
-}
-
-function scalarMultiply(a: bigint, b: bigint): bigint {
-    return (a * b) % curve.n
-}
-
-function scalarAdd(a: bigint, b: bigint): bigint {
-    return (a + b) % curve.n
+    return { r, s }
 }

@@ -1,10 +1,7 @@
 import 'mocha'
 import * as assert from 'assert'
 import * as util from '../src/util'
-import PrivateKey from '../src/private-key'
-import PublicKey from '../src/public-key'
-import { Point, INFINITE_POINT } from '../src/elliptic'
-import { sign, verify, Signature } from '../src/signature'
+import { sign, verify, Signature } from '../src'
 
 function buffer(hex: string): Uint8Array {
     return util.bufferFromHex(hex)
@@ -27,7 +24,7 @@ describe('signature', () => {
                 '787A848E71043D280C50470E8E1532B2DD5D20EE912A45DBDD2BD1DFBF187EF67031A98831859DC34DFFEEDDA86831842CCD0079E1F92AF177F7F22CC1DCED05'
             )
             const sig = sign(message, secret)
-            assert.strictEqual(hex(sig.toBuffer()), hex(expected))
+            assert.strictEqual(hex(Signature.toBytes(sig)), hex(expected))
 
             const pubkey = buffer('0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798')
             assert(verify(pubkey, message, sig))
@@ -51,11 +48,11 @@ describe('signature', () => {
                 // test signing
                 if (seckey) {
                     const sigActual = sign(msg, seckey)
-                    assert.strictEqual(hex(sigActual.toBuffer()), hex(sig))
+                    assert.strictEqual(hex(Signature.toBytes(sigActual)), hex(sig))
                 }
 
                 // test verifying
-                const actualVerifies = verify(pubkey, msg, Signature.fromBuffer(sig))
+                const actualVerifies = verify(pubkey, msg, Signature.fromBytes(sig))
                 assert.strictEqual(actualVerifies, verifies)
             }
         })
