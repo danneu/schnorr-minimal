@@ -1,4 +1,5 @@
 import { mod, powmod, modInverse, secp256k1 as curve } from './util'
+import * as assert from 'assert'
 
 const P = curve.p
 
@@ -17,8 +18,17 @@ export const INFINITE_POINT: Point = new class {
     }
 }()
 
-export function add(a: Point, b: Point): Point {
-    return fastAdd(a, b)
+// export function add(a: Point, b: Point): Point {
+//     return fastAdd(a, b)
+// }
+
+export function add(...points: Point[]): Point {
+    assert(points.length > 1)
+    let point = points[0]
+    for (let i = 1; i < points.length; i++) {
+        point = fastAdd(point, points[i])
+    }
+    return point
 }
 
 export function subtract(a: Point, b: Point): Point {

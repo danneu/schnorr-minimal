@@ -93,8 +93,30 @@ export function bufferFromHex(hex: string): Uint8Array {
     return new Uint8Array(hex.match(/.{1,2}/g)!.map((byte) => Number.parseInt(byte, 16)))
 }
 
-export function bufferToBigInt(buf: Uint8Array): bigint {
-    return BigInt('0x' + bufferToHex(buf))
+// export function bufferToBigInt(buf: Uint8Array): bigint {
+//     return BigInt('0x' + bufferToHex(buf))
+// }
+
+export function bufferToBigInt(bytes: Uint8Array): bigint {
+    let result = 0n
+    const n = bytes.length
+
+    // Read input in 8 byte slices
+    if (n >= 8) {
+        const view = new DataView(bytes.buffer, bytes.byteOffset)
+
+        for (let i = 0, k = n & ~7; i < k; i += 8) {
+            const x = view.getBigUint64(i, false)
+            result = (result << 64n) + x
+        }
+    }
+
+    // Mop up any remaining bytes
+    for (let i = n & ~7; i < n; i++) {
+        result = result * 256n + BigInt(bytes[i])
+    }
+
+    return result
 }
 
 // Buffer is fixed-length 32bytes
@@ -190,4 +212,9 @@ export function constantTimeBufferEquals(a: Uint8Array, b: Uint8Array): boolean 
 
 export function utf8ToBuffer(text: string): Uint8Array {
     return new TextEncoder().encode(text)
+}
+
+export function isPointOnCurve({ x, y }: Point): boolean {
+    const { p, a, b } = secp256k1
+    return (y * y - (x * x * x + a * x + b)) % p === 0n
 }
