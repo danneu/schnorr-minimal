@@ -17,7 +17,7 @@ export type Unblinder = { alpha: bigint; r: bigint /* R.x */ }
 export type BlindedSignature = { s: bigint }
 
 export function blindMessage(
-    secret: bigint,
+    secret: Uint8Array,
     nonce: Point,
     signer: Point,
     message: Uint8Array
@@ -27,7 +27,7 @@ export function blindMessage(
     const P = signer
 
     const alpha = bufferToBigInt(
-        hmac(utf8ToBuffer('alpha'), [bufferFromBigInt(secret), pointToBuffer(nonce), pointToBuffer(signer), message])
+        hmac(utf8ToBuffer('alpha'), [secret, pointToBuffer(nonce), pointToBuffer(signer), message])
     )
 
     // spin beta until we find quadratic residue
@@ -37,7 +37,7 @@ export function blindMessage(
     while (true) {
         beta = bufferToBigInt(
             hmac(utf8ToBuffer('beta'), [
-                bufferFromBigInt(secret),
+                secret,
                 pointToBuffer(nonce),
                 pointToBuffer(signer),
                 message,

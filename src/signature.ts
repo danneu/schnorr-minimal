@@ -3,6 +3,7 @@ import { secp256k1 as curve, powmod, pointFromBuffer, bufferToHex } from './util
 import { jacobi, concatBuffers as concat, bufferToBigInt as int, pointToBuffer, bufferFromBigInt } from './util'
 import { pointMultiply, pointSubtract, INFINITE_POINT } from './elliptic'
 import { hash } from './sha256'
+import { Point } from '.'
 
 // Schnorr Signatures
 //
@@ -52,22 +53,10 @@ export function sign(message: Uint8Array, secret: bigint): Signature {
     return sig
 }
 
-export function verify(pubkey: Uint8Array, message: Uint8Array, sig: Signature): boolean {
-    assert(pubkey.length === 33, 'pubkey should be 33bytes')
+export function verify(pubkey: Point, message: Uint8Array, sig: Signature): boolean {
     assert(message.length === 32, 'message must be 32bytes')
-    const pk = pubkey
     const m = message
-
-    let P
-    try {
-        P = pointFromBuffer(pk)
-    } catch (err) {
-        if (err.message === 'point not on curve') {
-            return false
-        } else {
-            throw err
-        }
-    }
+    const P = pubkey
 
     const { r, s } = sig
 

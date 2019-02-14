@@ -1,10 +1,10 @@
 import * as assert from 'assert'
 import { hash } from '../src/sha256'
-import { secp256k1 as curve, utf8ToBuffer, bufferToBigInt } from '../src/util'
+import { secp256k1 as curve, utf8ToBuffer, bufferToBigInt, bufferFromBigInt } from '../src/util'
 import { Point, verify, blindMessage, blindSign, unblind } from '../src'
 
 function verifyTest(): boolean {
-    const secretSeed = randomScalar()
+    const secretSeed = bufferFromBigInt(randomScalar())
     const noncePriv = randomScalar()
     const signerPriv = randomScalar()
     const noncePub = Point.fromPrivKey(noncePriv)
@@ -21,7 +21,7 @@ function verifyTest(): boolean {
     const sig = unblind(unblinder, blindedSig)
 
     // verify
-    const verified = verify(Point.toBytes(signerPub), message, sig)
+    const verified = verify(signerPub, message, sig)
 
     return verified
 }

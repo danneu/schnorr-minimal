@@ -1,7 +1,7 @@
 import 'mocha'
 import * as assert from 'assert'
 import * as util from '../src/util'
-import { sign, verify, Signature } from '../src'
+import { sign, verify, Signature, Point } from '../src'
 
 function buffer(hex: string): Uint8Array {
     return util.bufferFromHex(hex)
@@ -27,7 +27,7 @@ describe('signature', () => {
             assert.strictEqual(hex(Signature.toBytes(sig)), hex(expected))
 
             const pubkey = buffer('0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798')
-            assert(verify(pubkey, message, sig))
+            assert(verify(Point.fromBytes(pubkey), message, sig))
         })
 
         it('passes fixtures', () => {
@@ -40,10 +40,21 @@ describe('signature', () => {
 
             for (let [seckey, pubkey, msg, sig, verifies, comment] of rows.slice(1)) {
                 seckey = seckey.length ? int(buffer(seckey)) : null
-                pubkey = buffer(pubkey)
                 msg = buffer(msg)
                 sig = buffer(sig.trim())
                 verifies = verifies === 'TRUE'
+
+                // TODO: This is clunky
+                try {
+                    pubkey = Point.fromHex(pubkey)
+                } catch (err) {
+                    if (err.message === 'point not on curve') {
+                        assert(!verifies, 'point not on curve should not verify')
+                        continue
+                    } else {
+                        throw err
+                    }
+                }
 
                 // test signing
                 if (seckey) {
