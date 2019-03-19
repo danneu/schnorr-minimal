@@ -34,30 +34,6 @@ export function powmod(base: bigint, exp: bigint, m: bigint): bigint {
     }
 }
 
-export function modInverse(a: bigint, m: bigint): bigint {
-    if (a < 0 || m <= a) {
-        a = mod(a, m)
-    }
-
-    let [c, d] = [a, m]
-    let q = d / c
-    let [uc, vc, ud, vd] = [1n, 0n, 0n, 1n]
-
-    while (c !== 0n) {
-        ;[q, c, d] = [d / c, mod(d, c), c]
-        ;[uc, vc, ud, vd] = [ud - q * uc, vd - q * vc, uc, vc]
-    }
-
-    // At this point, d is the GCD, and ud*a+vd*m = d.
-    // If d == 1, this means that ud is a inverse.
-    assert.strictEqual(d, 1n)
-    if (ud > 0) {
-        return ud
-    } else {
-        return ud + m
-    }
-}
-
 function bigIntSqrt(n: bigint): bigint {
     if (n < 0n) {
         throw new Error('cannot sqrt negative number')

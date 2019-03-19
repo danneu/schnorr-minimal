@@ -16,8 +16,6 @@ describe('elliptic', () => {
     // 3. Compute points P=aG, Q=bG, R=cG
     // 4. Verify that P+Q=Q+P=R
     it('works with random scalars', function() {
-        this.timeout(20000)
-
         function randomScalar(): bigint {
             const buf = new Uint8Array(32)
             randomFillSync(buf)

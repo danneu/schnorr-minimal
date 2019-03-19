@@ -135,7 +135,7 @@ export function naiveMultiply(point: Point, scalar: bigint): Point {
 
 type Jacobian = [bigint, bigint, bigint]
 
-// Rewritten util.modInverse
+// https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
 function inv(a: bigint, n: bigint): bigint {
     if (a === 0n) {
         return 0n
