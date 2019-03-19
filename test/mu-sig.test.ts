@@ -1,12 +1,11 @@
-import { Point, muSig, verify, util } from '../src'
+import * as assert from 'assert'
+import { muSig, Point, util, verify } from '../src'
 import { hash } from '../src/sha256'
 import * as helpers from './helpers'
-import * as assert from 'assert'
-
-const testVectors = require('./fixtures/bip-schnorr/test-vectors-mu-sig.json')
 
 describe('mu-sig', () => {
     describe('pubkeyCombine', () => {
+        const testVectors = require('./fixtures/bip-schnorr/test-vectors-mu-sig.json')
         for (const vec of testVectors) {
             it(`can combine pubkeys into ${vec.pubKeyCombined}`, () => {
                 const pubkeys = vec.pubKeys.map(Point.fromHex)

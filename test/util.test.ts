@@ -1,5 +1,5 @@
-import 'mocha'
 import * as assert from 'assert'
+import 'mocha'
 import * as util from '../src/util'
 
 describe('bufferFromHex', () => {

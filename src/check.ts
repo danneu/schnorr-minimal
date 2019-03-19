@@ -1,6 +1,6 @@
+import * as assert from 'assert'
 import { Point, Scalar, Signature } from '.'
 import * as util from './util'
-import * as assert from 'assert'
 
 export function pubkeysAreUnique(pubkeys: Point[]): Point[] {
     assert(pubkeys.length > 0, 'pubkeys array was empty')

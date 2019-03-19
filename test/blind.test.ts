@@ -1,7 +1,7 @@
 import * as assert from 'assert'
+import { blindMessage, blindSign, Point, unblind, verify } from '../src'
 import { hash } from '../src/sha256'
-import { secp256k1 as curve, utf8ToBuffer, bufferToBigInt, bufferFromBigInt } from '../src/util'
-import { Point, verify, blindMessage, blindSign, unblind } from '../src'
+import { bufferFromBigInt, bufferToBigInt, secp256k1 as curve, utf8ToBuffer } from '../src/util'
 
 function verifyTest(): boolean {
     const secretSeed = bufferFromBigInt(randomScalar())

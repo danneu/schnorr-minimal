@@ -1,5 +1,5 @@
-import 'mocha'
 import * as assert from 'assert'
+import 'mocha'
 import { hash } from '../src/sha256'
 import { bufferToHex as hex } from '../src/util'
 

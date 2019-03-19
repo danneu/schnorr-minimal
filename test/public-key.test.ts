@@ -1,8 +1,8 @@
-import 'mocha'
 import * as assert from 'assert'
-import * as util from '../src/util'
-import { INFINITE_POINT, pointAdd, pointMultiply } from '../src/elliptic'
+import 'mocha'
 import { Point, Scalar } from '../src'
+import { INFINITE_POINT, pointAdd, pointMultiply } from '../src/elliptic'
+import * as util from '../src/util'
 
 describe('PublicKey', () => {
     describe('fromBuffer', () => {
@@ -109,7 +109,7 @@ describe('PublicKey', () => {
             const { join } = require('path')
             const { readFileSync } = require('fs')
             const re = /k = ([a-z0-9]+)\nx = ([a-z0-9]+)\ny = ([a-z0-9]+)/i
-            let text = readFileSync(join(__dirname, './fixtures/hxbitcoin.txt'), 'utf8')
+            const text = readFileSync(join(__dirname, './fixtures/hxbitcoin.txt'), 'utf8')
             const fixtures = []
             for (const part of text.split('\n\n')) {
                 let [, k, x, y] = part.match(re)

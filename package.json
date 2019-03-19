@@ -11,10 +11,14 @@
         "mocha": "^5.2.0",
         "prettier": "^1.16.4",
         "ts-node": "^8.0.2",
+        "tslint": "^5.14.0",
+        "tslint-config-prettier": "^1.18.0",
         "typescript": "^3.3.1"
     },
     "scripts": {
         "build": "rm -rf dist/ && tsc",
-        "test": "mocha -r ts-node/register \"test/**/*.test.ts\""
+        "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
+        "tslint": "tslint -c tslint.json '{test,src}/**/*.ts'",
+        "tslint-fix": "npm run tslint -- --fix"
     }
 }

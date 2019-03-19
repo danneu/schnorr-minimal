@@ -1,7 +1,7 @@
-import 'mocha'
 import * as assert from 'assert'
-import * as util from '../src/util'
+import 'mocha'
 import { Scalar } from '../src'
+import * as util from '../src/util'
 
 describe('PrivateKey', () => {
     describe('fromBuffer', () => {

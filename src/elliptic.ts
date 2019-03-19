@@ -1,16 +1,16 @@
+import * as assert from 'assert'
+import * as check from './check'
 import {
-    mod,
-    powmod,
-    secp256k1 as curve,
     bufferFromBigInt,
+    bufferFromHex,
     bufferToBigInt,
+    bufferToHex,
+    mod,
     pointFromBuffer,
     pointToBuffer,
-    bufferFromHex,
-    bufferToHex,
+    powmod,
+    secp256k1 as curve,
 } from './util'
-import * as check from './check'
-import * as assert from 'assert'
 
 const P = curve.p
 

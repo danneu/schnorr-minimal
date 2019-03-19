@@ -5,13 +5,13 @@ import { hash } from './sha256'
 export const secp256k1 = {
     a: 0x0000000000000000000000000000000000000000000000000000000000000000n,
     b: 0x0000000000000000000000000000000000000000000000000000000000000007n,
-    p: 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn,
     g: {
         x: 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n,
         y: 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n,
     },
     // order
     n: 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,
+    p: 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn,
 }
 
 // Handles negative quotients.
@@ -24,8 +24,10 @@ export function mod(a: bigint, b: bigint): bigint {
 
 // pows then mods, but uses intermediate mods to keep intermediate number within bigint range
 export function powmod(base: bigint, exp: bigint, m: bigint): bigint {
-    if (exp === 0n) return 1n
-    if (exp % 2n == 0n) {
+    if (exp === 0n) {
+        return 1n
+    }
+    if (exp % 2n === 0n) {
         return mod(powmod(base, exp / 2n, m) ** 2n, m)
     } else {
         return mod(base * powmod(base, exp - 1n, m), m)
@@ -65,6 +67,7 @@ function bigIntSqrt(n: bigint): bigint {
         return n
     }
 
+    // tslint:disable-next-line: no-shadowed-variable
     function newtonIteration(n: bigint, x0: bigint): bigint {
         const x1 = (n / x0 + x0) >> 1n
         if (x0 === x1 || x0 === x1 - 1n) {
@@ -79,8 +82,8 @@ function bigIntSqrt(n: bigint): bigint {
 export function bufferToHex(buf: Uint8Array): string {
     let result = ''
 
-    for (let i = 0; i < buf.length; i++) {
-        const value = buf[i].toString(16)
+    for (const b of buf) {
+        const value = b.toString(16)
         result += value.length === 1 ? '0' + value : value
     }
 
@@ -141,16 +144,16 @@ export function bufferFromBigInt(n: bigint): Uint8Array {
 
 export function concatBuffers(...buffs: Uint8Array[]) {
     let totalSize = 0
-    for (let i = 0; i < buffs.length; i++) {
-        assert(buffs[i] instanceof Uint8Array)
-        totalSize += buffs[i].length
+    for (const buf of buffs) {
+        assert(buf instanceof Uint8Array)
+        totalSize += buf.length
     }
 
     const res = new Uint8Array(totalSize)
     let writeAt = 0
-    for (let i = 0; i < buffs.length; i++) {
-        res.set(buffs[i], writeAt)
-        writeAt += buffs[i].length
+    for (const buf of buffs) {
+        res.set(buf, writeAt)
+        writeAt += buf.length
     }
 
     return res

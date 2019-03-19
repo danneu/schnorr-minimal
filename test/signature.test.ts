@@ -1,10 +1,9 @@
-import 'mocha'
 import * as assert from 'assert'
-import * as util from '../src/util'
-import { sign, verify, Signature, Point } from '../src'
+import 'mocha'
+import { Point, sign, Signature, util, verify } from '../src'
 
-function buffer(hex: string): Uint8Array {
-    return util.bufferFromHex(hex)
+function buffer(hexString: string): Uint8Array {
+    return util.bufferFromHex(hexString)
 }
 
 function hex(buf: Uint8Array): string {

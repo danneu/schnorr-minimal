@@ -1,7 +1,7 @@
-import { Scalar } from '../src'
-import * as util from '../src/util'
 import * as crypto from 'crypto'
+import { Scalar } from '../src'
 import * as check from '../src/check'
+import * as util from '../src/util'
 
 export function randomPrivkey(): Scalar {
     const buf = new Uint8Array(32)

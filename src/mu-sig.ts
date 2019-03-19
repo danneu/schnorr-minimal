@@ -1,17 +1,17 @@
-import { Scalar, Point, pointMultiply, pointAdd, INFINITE_POINT, Signature } from '.'
+import * as assert from 'assert'
+import { INFINITE_POINT, Point, pointAdd, pointMultiply, Scalar, Signature } from '.'
+import * as check from './check'
+import { hash } from './sha256'
 import {
-    utf8ToBuffer,
-    concatBuffers,
-    pointToBuffer,
     bufferToBigInt,
+    concatBuffers,
+    getE,
     getK,
     getK0,
-    getE,
+    pointToBuffer,
     secp256k1 as curve,
+    utf8ToBuffer,
 } from './util'
-import { hash } from './sha256'
-import * as assert from 'assert'
-import * as check from './check'
 
 // https://blockstream.com/2018/01/23/musig-key-aggregation-schnorr-signatures/
 

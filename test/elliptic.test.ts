@@ -1,8 +1,8 @@
-import 'mocha'
 import * as assert from 'assert'
-import * as util from '../src/util'
-import { INFINITE_POINT, pointAdd as add, pointMultiply as multiply } from '../src/elliptic'
 import { randomFillSync } from 'crypto'
+import 'mocha'
+import { INFINITE_POINT, pointAdd as add, pointMultiply as multiply } from '../src/elliptic'
+import * as util from '../src/util'
 
 describe('elliptic', () => {
     describe('G * order', () => {

@@ -1,16 +1,16 @@
-import { Point, pointMultiply as mul, pointAdd as add, scalarAdd, scalarMultiply } from './elliptic'
-import { Signature } from './signature'
 import * as assert from 'assert'
+import { Point, pointAdd as add, pointMultiply as mul, scalarAdd, scalarMultiply } from './elliptic'
+import { hash, hmac } from './sha256'
+import { Signature } from './signature'
 import {
-    utf8ToBuffer,
-    concatBuffers as concat,
-    secp256k1 as curve,
-    bufferToBigInt,
     bufferFromBigInt,
+    bufferToBigInt,
+    concatBuffers as concat,
     jacobi,
     pointToBuffer,
+    secp256k1 as curve,
+    utf8ToBuffer,
 } from './util'
-import { hash, hmac } from './sha256'
 
 export type BlindedMessage = { c: bigint /* c = challenge */ }
 export type Unblinder = { alpha: bigint; r: bigint /* R.x */ }
@@ -72,6 +72,6 @@ export function blindSign(signer: bigint, nonce: bigint, { c }: BlindedMessage):
 }
 
 export function unblind({ alpha, r }: Unblinder, blindedSig: BlindedSignature): Signature {
-    let s = scalarAdd(blindedSig.s, alpha)
+    const s = scalarAdd(blindedSig.s, alpha)
     return { r, s }
 }

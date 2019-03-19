@@ -1,19 +1,18 @@
 import * as assert from 'assert'
-import { secp256k1 as curve, powmod, pointFromBuffer, bufferToHex } from './util'
-import {
-    getE,
-    getK0,
-    getK,
-    jacobi,
-    concatBuffers as concat,
-    bufferToBigInt as int,
-    pointToBuffer,
-    bufferFromBigInt,
-} from './util'
-import { pointMultiply, pointSubtract, INFINITE_POINT } from './elliptic'
-import { hash } from './sha256'
 import { Point } from '.'
 import * as check from './check'
+import { INFINITE_POINT, pointMultiply, pointSubtract } from './elliptic'
+import {
+    bufferFromBigInt,
+    bufferToBigInt as int,
+    bufferToHex,
+    concatBuffers as concat,
+    getE,
+    getK,
+    getK0,
+    jacobi,
+    secp256k1 as curve,
+} from './util'
 
 // Schnorr Signatures
 //

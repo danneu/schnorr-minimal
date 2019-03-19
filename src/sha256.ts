@@ -1,3 +1,4 @@
+/* tslint:disable */
 const digestLength: number = 32
 const blockSize: number = 64
 
