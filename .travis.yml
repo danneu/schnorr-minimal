@@ -1,0 +1,4 @@
+language: node_js
+node_js:
+    #- "10.4" # Node got bigint
+    - '11' # Node got TextEncoder

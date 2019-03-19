@@ -1,4 +1,4 @@
-# secp256k1-minimal
+# secp256k1-minimal ![build status](https://api.travis-ci.org/danneu/secp256k1-minimal.svg?branch=master)
 
 A simple but naive Typescript implementation. Use at your own risk.
 
@@ -12,7 +12,7 @@ A simple but naive Typescript implementation. Use at your own risk.
 ## Goals
 
 1. Zero dependencies
-2. Works in Node and web browsers (https://caniuse.com/#search=bigint)
+2. Works in Node and web browsers (https://caniuse.com/#feat=bigint 💀)
 
 ## Plans
 

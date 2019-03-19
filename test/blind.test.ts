@@ -31,7 +31,9 @@ describe('blind', () => {
         assert(verifyTest())
     })
 
-    it('works many times', () => {
+    it('works many times', function() {
+        this.timeout(5000)
+
         let [yes, no] = [0, 0]
         for (let i = 0; i < 100; i++) {
             const verified = verifyTest()
