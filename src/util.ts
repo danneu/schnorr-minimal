@@ -118,16 +118,16 @@ export function bufferFromBigInt(n: bigint): Uint8Array {
     return buf
 }
 
-export function concatBuffers(...buffs: Uint8Array[]) {
+export function concatBuffers(...bufs: Uint8Array[]) {
     let totalSize = 0
-    for (const buf of buffs) {
+    for (const buf of bufs) {
         assert(buf instanceof Uint8Array)
         totalSize += buf.length
     }
 
     const res = new Uint8Array(totalSize)
     let writeAt = 0
-    for (const buf of buffs) {
+    for (const buf of bufs) {
         res.set(buf, writeAt)
         writeAt += buf.length
     }
@@ -210,6 +210,7 @@ export function getK(R: Point, k0: bigint): bigint {
 export function getK0(privkey: Scalar, message: Uint8Array): Scalar {
     const k0 = bufferToBigInt(hash(concatBuffers(bufferFromBigInt(privkey), message))) % secp256k1.n
     if (k0 === 0n) {
+        // We got incredibly unlucky
         throw new Error('k0 is zero')
     }
     return k0

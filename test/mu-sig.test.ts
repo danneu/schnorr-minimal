@@ -1,17 +1,45 @@
 import * as assert from 'assert'
-import { muSig, Point, util, verify } from '../src'
+import { muSig, Point, util, verify, Scalar, Signature } from '../src'
 import { hash } from '../src/sha256'
 import * as helpers from './helpers'
+import { bufferFromHex } from '../src/util'
+
+type NodeBipSchnorr_MuSigVector = {
+    privkeys: Scalar[]
+    pubkeys: Point[]
+    pubkeyCombined: Point
+    message: Uint8Array
+    signature: Signature
+}
+
+const muSigVectors: NodeBipSchnorr_MuSigVector[] = (() => {
+    const objs = require('./fixtures/node-bip-schnorr/test-vectors-mu-sig.json')
+    const vectors = []
+    for (const o of objs) {
+        vectors.push({
+            privkeys: o.privKeys.map(Scalar.fromHex),
+            pubkeys: o.pubKeys.map(Point.fromHex),
+            pubkeyCombined: Point.fromHex(o.pubKeyCombined),
+            message: bufferFromHex(o.message),
+            signature: Signature.fromHex(o.signature),
+        })
+    }
+    return vectors
+})()
 
 describe('mu-sig', () => {
-    describe('pubkeyCombine', () => {
-        const testVectors = require('./fixtures/bip-schnorr/test-vectors-mu-sig.json')
-        for (const vec of testVectors) {
-            it(`can combine pubkeys into ${vec.pubKeyCombined}`, () => {
-                const pubkeys = vec.pubKeys.map(Point.fromHex)
-                const pubkeyCombined = muSig.pubkeyCombine(pubkeys)
-                assert.strictEqual(Point.toHex(pubkeyCombined), vec.pubKeyCombined)
-            })
+    it(`passes ${muSigVectors.length} musig vectors`, () => {
+        for (const vec of muSigVectors) {
+            // test that our pubkeyCombine matches vector's pubkeyCombine
+            const actualPubkeyCombined = muSig.pubkeyCombine(vec.pubkeys)
+            assert.deepStrictEqual(actualPubkeyCombined, vec.pubkeyCombined)
+
+            // given vector should verify
+            assert.ok(verify(vec.pubkeyCombined, vec.message, vec.signature))
+
+            // our sign() signature should verify too
+            const actualSig = muSig.sign(vec.privkeys, vec.message)
+            assert.ok(verify(vec.pubkeyCombined, vec.message, actualSig))
         }
     })
 

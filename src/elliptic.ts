@@ -12,8 +12,6 @@ import {
     secp256k1 as curve,
 } from './util'
 
-const P = curve.p
-
 export type Scalar = bigint
 
 export const Scalar = {
@@ -78,6 +76,10 @@ export function scalarMultiply(a: Scalar, b: Scalar): Scalar {
 // export function add(a: Point, b: Point): Point {
 //     return fastAdd(a, b)
 // }
+
+export function pointEq(a: Point, b: Point): boolean {
+    return a.x === b.x && a.y === b.y
+}
 
 export function pointAdd(...points: Point[]): Point {
     assert(points.length > 1)
@@ -177,6 +179,8 @@ function jacobianDouble(p: Jacobian): Jacobian {
 }
 
 function jacobianAdd(p: Jacobian, q: Jacobian): Jacobian {
+    const P = curve.p
+
     if (p[1] === 0n) {
         return q
     }
