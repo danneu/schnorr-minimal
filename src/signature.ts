@@ -4,17 +4,17 @@ import * as check from './check'
 import { INFINITE_POINT, pointEq, pointMultiply, pointSubtract } from './elliptic'
 import {
     bufferFromBigInt,
+    bufferFromHex,
+    bufferToBigInt,
     bufferToBigInt as int,
     bufferToHex,
     concatBuffers as concat,
+    curve,
     getE,
     getK,
     getK0,
     jacobi,
-    secp256k1 as curve,
     powmod,
-    bufferToBigInt,
-    bufferFromHex,
 } from './util'
 
 // Schnorr Signatures

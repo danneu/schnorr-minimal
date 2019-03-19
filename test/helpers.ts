@@ -6,7 +6,7 @@ import * as util from '../src/util'
 export function randomPrivkey(): Scalar {
     const buf = new Uint8Array(32)
     crypto.randomFillSync(buf)
-    const privkey = util.bufferToBigInt(buf) % util.secp256k1.n
+    const privkey = util.bufferToBigInt(buf) % util.curve.n
     return check.checkPrivkey(privkey)
 }
 

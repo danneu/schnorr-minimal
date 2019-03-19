@@ -6,9 +6,9 @@ import {
     bufferFromBigInt,
     bufferToBigInt,
     concatBuffers as concat,
+    curve,
     jacobi,
     pointToBuffer,
-    secp256k1 as curve,
     utf8ToBuffer,
 } from './util'
 

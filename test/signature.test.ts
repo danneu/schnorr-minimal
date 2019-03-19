@@ -1,8 +1,8 @@
 import * as assert from 'assert'
 import 'mocha'
-import { Point, sign, Signature, util, verify, Scalar } from '../src'
-import { bufferFromHex } from '../src/util'
+import { Point, Scalar, sign, Signature, util, verify } from '../src'
 import { batchVerify } from '../src/signature'
+import { bufferFromHex } from '../src/util'
 
 function buffer(hexString: string): Uint8Array {
     return util.bufferFromHex(hexString)
@@ -20,7 +20,7 @@ type SipaVector = {
     privkey?: Scalar
     pubkey: Point | Error // deserialize error
     message: Uint8Array
-    signature: Uint8Array
+    signature: Signature
     shouldVerify: boolean
     comment?: string
 }
@@ -37,7 +37,7 @@ const sipaVectors: SipaVector[] = (() => {
     for (let [privkey, pubkey, message, signature, shouldVerify, comment] of rows.slice(1)) {
         privkey = privkey.length ? int(buffer(privkey)) : undefined
         message = buffer(message)
-        signature = buffer(signature.trim())
+        signature = Signature.fromHex(signature.trim())
         shouldVerify = shouldVerify === 'TRUE'
 
         try {
@@ -49,16 +49,16 @@ const sipaVectors: SipaVector[] = (() => {
         // given privkey should generate pubkey that matches given pubkey
         if (privkey) {
             const sigActual = sign(message, privkey)
-            assert.strictEqual(hex(Signature.toBytes(sigActual)), hex(signature))
+            assert.deepStrictEqual(sigActual, signature)
         }
 
         vectors.push({
+            comment,
+            message,
             privkey,
             pubkey,
-            message,
-            signature,
             shouldVerify,
-            comment,
+            signature,
         })
     }
 
@@ -89,12 +89,12 @@ const nodeBipSchnorrVectors: NodeBipSchnorrVector[] = (() => {
             }
         }
         vectors.push({
+            comment: o.comment,
+            message: bufferFromHex(o.m),
             privkey: o.d ? Scalar.fromHex(o.d) : undefined,
             pubkey,
-            message: bufferFromHex(o.m),
-            signature: Signature.fromHex(o.sig),
             shouldVerify: o.result,
-            comment: o.comment,
+            signature: Signature.fromHex(o.sig),
         })
     }
 
@@ -172,14 +172,14 @@ describe('signature', () => {
             }
 
             // test verifying
-            const actualVerifies = verify(vec.pubkey, vec.message, Signature.fromBytes(vec.signature))
+            const actualVerifies = verify(vec.pubkey, vec.message, vec.signature)
             assert.strictEqual(actualVerifies, vec.shouldVerify)
 
             // only batch verify the positive vectors
             if (vec.shouldVerify) {
                 pubkeys.push(vec.pubkey)
                 messages.push(vec.message)
-                signatures.push(Signature.fromBytes(vec.signature))
+                signatures.push(vec.signature)
             }
         }
 

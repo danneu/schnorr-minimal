@@ -61,7 +61,7 @@ export function checkPrivkey(privkey: Scalar): Scalar {
     check(typeof privkey === 'bigint', 'privkey must be bigint')
     // validate data
     check(privkey >= 1n, 'privkey must be in range 1 to n-1')
-    check(privkey <= util.secp256k1.n - 1n, 'privkey must be in range 1 to n-1')
+    check(privkey <= util.curve.n - 1n, 'privkey must be in range 1 to n-1')
     return privkey
 }
 
@@ -71,8 +71,8 @@ export function checkSignature(sig: Signature): Signature {
     check(typeof sig.r === 'bigint', 'signature.r must be bigint')
     check(typeof sig.s === 'bigint', 'signatuer.s must be bigint')
     // validate data
-    check(sig.r < util.secp256k1.p, 'signature.r is greater or equal to curve field size')
-    check(sig.s < util.secp256k1.n, 'signature.s is greater or equal to curve order')
+    check(sig.r < util.curve.p, 'signature.r is greater or equal to curve field size')
+    check(sig.s < util.curve.n, 'signature.s is greater or equal to curve order')
     return sig
 }
 

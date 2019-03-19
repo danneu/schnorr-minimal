@@ -7,7 +7,7 @@ import * as util from '../src/util'
 describe('elliptic', () => {
     describe('G * order', () => {
         it('is infinite point', () => {
-            assert.strictEqual(multiply(util.secp256k1.g, util.secp256k1.n), INFINITE_POINT)
+            assert.strictEqual(multiply(util.curve.g, util.curve.n), INFINITE_POINT)
         })
     })
 
@@ -21,7 +21,7 @@ describe('elliptic', () => {
         function randomScalar(): bigint {
             const buf = new Uint8Array(32)
             randomFillSync(buf)
-            return util.bufferToBigInt(buf) % util.secp256k1.n
+            return util.bufferToBigInt(buf) % util.curve.n
         }
 
         for (let i = 0; i < 16; i++) {
@@ -29,9 +29,9 @@ describe('elliptic', () => {
             const b = randomScalar()
             const c = a + b
 
-            const P = multiply(util.secp256k1.g, a)
-            const Q = multiply(util.secp256k1.g, b)
-            const R = multiply(util.secp256k1.g, c)
+            const P = multiply(util.curve.g, a)
+            const Q = multiply(util.curve.g, b)
+            const R = multiply(util.curve.g, c)
             // console.log({ a, b, c, P, Q, R })
 
             assert.deepStrictEqual(add(P, Q), R)

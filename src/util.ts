@@ -2,7 +2,8 @@ import * as assert from 'assert'
 import { Point, Scalar } from './elliptic'
 import { hash } from './sha256'
 
-export const secp256k1 = {
+// secp256k1 parameters
+export const curve = {
     a: 0x0000000000000000000000000000000000000000000000000000000000000000n,
     b: 0x0000000000000000000000000000000000000000000000000000000000000007n,
     g: {
@@ -150,7 +151,7 @@ export function pointFromBuffer(buf: Uint8Array): Point {
 
     const x = bufferToBigInt(buf.slice(1, 33))
 
-    const { p } = secp256k1
+    const { p } = curve
     const ysq = (powmod(x, 3n, p) + 7n) % p
     const y0 = powmod(ysq, (p + 1n) / 4n, p)
     if (powmod(y0, 2n, p) !== ysq) {
@@ -195,20 +196,20 @@ export function utf8ToBuffer(text: string): Uint8Array {
 }
 
 export function isPointOnCurve({ x, y }: Point): boolean {
-    const { p, a, b } = secp256k1
+    const { p, a, b } = curve
     return (y * y - (x * x * x + a * x + b)) % p === 0n
 }
 
 export function jacobi(y: bigint): bigint {
-    return powmod(y, (secp256k1.p - 1n) / 2n, secp256k1.p)
+    return powmod(y, (curve.p - 1n) / 2n, curve.p)
 }
 
 export function getK(R: Point, k0: bigint): bigint {
-    return jacobi(R.y) === 1n ? k0 : secp256k1.n - k0
+    return jacobi(R.y) === 1n ? k0 : curve.n - k0
 }
 
 export function getK0(privkey: Scalar, message: Uint8Array): Scalar {
-    const k0 = bufferToBigInt(hash(concatBuffers(bufferFromBigInt(privkey), message))) % secp256k1.n
+    const k0 = bufferToBigInt(hash(concatBuffers(bufferFromBigInt(privkey), message))) % curve.n
     if (k0 === 0n) {
         // We got incredibly unlucky
         throw new Error('k0 is zero')
@@ -217,5 +218,5 @@ export function getK0(privkey: Scalar, message: Uint8Array): Scalar {
 }
 
 export function getE(Rx: bigint, P: Point, m: Uint8Array): bigint {
-    return bufferToBigInt(hash(concatBuffers(bufferFromBigInt(Rx), pointToBuffer(P), m))) % secp256k1.n
+    return bufferToBigInt(hash(concatBuffers(bufferFromBigInt(Rx), pointToBuffer(P), m))) % curve.n
 }

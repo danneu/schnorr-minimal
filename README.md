@@ -1,6 +1,8 @@
-# secp256k1-minimal ![build status](https://api.travis-ci.org/danneu/secp256k1-minimal.svg?branch=master)
+# schnorr-minimal ![build status](https://api.travis-ci.org/danneu/schnorr-minimal.svg?branch=master)
 
-A simple but naive Typescript implementation. Use at your own risk.
+A simple but naive Typescript implementation of Schnorr signatures on the secp256k1 elliptical curve.
+
+Use at your own risk.
 
 ## Features
 
@@ -23,7 +25,7 @@ A simple but naive Typescript implementation. Use at your own risk.
 (TODO) See tests for now.
 
 ```javascript
-import { Scalar, Point } from 'secp256k1-minimal'
+import { Scalar, Point } from 'schnorr-minimal'
 
 const priv = Scalar.fromHex('e47d79c74106dbc026a8e672ced54c3f23c7a001a2ef9318be3f338db4edba2d')
 const pub = Point.fromPrivKey(priv)

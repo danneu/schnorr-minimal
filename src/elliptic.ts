@@ -5,11 +5,11 @@ import {
     bufferFromHex,
     bufferToBigInt,
     bufferToHex,
+    curve,
     mod,
     pointFromBuffer,
     pointToBuffer,
     powmod,
-    secp256k1 as curve,
 } from './util'
 
 export type Scalar = bigint
