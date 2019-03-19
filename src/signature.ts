@@ -1,9 +1,19 @@
 import * as assert from 'assert'
 import { secp256k1 as curve, powmod, pointFromBuffer, bufferToHex } from './util'
-import { jacobi, concatBuffers as concat, bufferToBigInt as int, pointToBuffer, bufferFromBigInt } from './util'
+import {
+    getE,
+    getK0,
+    getK,
+    jacobi,
+    concatBuffers as concat,
+    bufferToBigInt as int,
+    pointToBuffer,
+    bufferFromBigInt,
+} from './util'
 import { pointMultiply, pointSubtract, INFINITE_POINT } from './elliptic'
 import { hash } from './sha256'
 import { Point } from '.'
+import * as check from './check'
 
 // Schnorr Signatures
 //
@@ -29,27 +39,27 @@ export const Signature = {
     },
 }
 
-export function sign(message: Uint8Array, secret: bigint): Signature {
+export function sign(message: Uint8Array, privkey: bigint): Signature {
+    assert.strictEqual(message.length, 32)
+    check.checkPrivkey(privkey)
     const m = message
-    const d = secret
-    assert.strictEqual(m.length, 32)
-    if (d < 1n || d > curve.n - 1n) {
-        throw new Error('secret must 1 <= d <= n-1')
-    }
-    const k0 = int(hash(concat(bufferFromBigInt(d), m))) % curve.n
+    const d = privkey
+
+    const k0 = getK0(d, m)
     if (k0 === 0n) {
         throw new Error('sig failed')
     }
     const R = pointMultiply(curve.g, k0)
 
     // nonce
-    const k = jacobi(R.y) === 1n ? k0 : curve.n - k0
+    const k = getK(R, k0)
 
     // challenge
-    const e = int(hash(concat(bufferFromBigInt(R.x), pointToBuffer(pointMultiply(curve.g, d)), m))) % curve.n
+    const e = getE(R.x, Point.fromPrivKey(d), m)
 
     const s = (k + e * d) % curve.n
     const sig = { r: R.x, s }
+    check.checkSignature(sig)
     return sig
 }
 
@@ -58,18 +68,14 @@ export function verify(pubkey: Point, message: Uint8Array, sig: Signature): bool
     const m = message
     const P = pubkey
 
+    try {
+        check.checkSignature(sig)
+    } catch (err) {
+        return false
+    }
+
     const { r, s } = sig
-
-    // TODO: Centralize validation
-    if (r >= curve.p) {
-        return false
-    }
-
-    if (s >= curve.n) {
-        return false
-    }
-
-    const e = int(hash(concat(bufferFromBigInt(r), pointToBuffer(P), m))) % curve.n
+    const e = getE(r, P, m)
     const R = pointSubtract(pointMultiply(curve.g, s), pointMultiply(P, e))
 
     if (R === INFINITE_POINT) {

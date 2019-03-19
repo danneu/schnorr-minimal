@@ -1,23 +1,26 @@
 # secp256k1-minimal
 
-A simple but naive implementation. Use at your own risk.
+A simple but naive Typescript implementation. Use at your own risk.
 
 ## Features
 
--   [Standardized](https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki) Schnorr signatures
+-   Schnorr signatures ([bip-schnorr](https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki))
+-   Multi signatures ([MuSig](https://blockstream.com/2018/01/23/musig-key-aggregation-schnorr-signatures/))
 -   Blind signatures
 -   Jacobian optimization
 
 ## Goals
 
-1. **Zero dependencies**
-2. **Works in web browsers** https://caniuse.com/#search=bigint
+1. Zero dependencies
+2. Works in Node and web browsers (https://caniuse.com/#search=bigint)
 
 ## Plans
 
 -   Migrate from bigint to uint8array internally.
 
 ## Usage
+
+(TODO) See tests for now.
 
 ```javascript
 import { Scalar, Point } from 'secp256k1-minimal'

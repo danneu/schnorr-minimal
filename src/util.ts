@@ -1,5 +1,6 @@
 import * as assert from 'assert'
-import { Point } from './elliptic'
+import { Point, Scalar } from './elliptic'
+import { hash } from './sha256'
 
 export const secp256k1 = {
     a: 0x0000000000000000000000000000000000000000000000000000000000000000n,
@@ -221,4 +222,20 @@ export function isPointOnCurve({ x, y }: Point): boolean {
 
 export function jacobi(y: bigint): bigint {
     return powmod(y, (secp256k1.p - 1n) / 2n, secp256k1.p)
+}
+
+export function getK(R: Point, k0: bigint): bigint {
+    return jacobi(R.y) === 1n ? k0 : secp256k1.n - k0
+}
+
+export function getK0(privkey: Scalar, message: Uint8Array): Scalar {
+    const k0 = bufferToBigInt(hash(concatBuffers(bufferFromBigInt(privkey), message))) % secp256k1.n
+    if (k0 === 0n) {
+        throw new Error('k0 is zero')
+    }
+    return k0
+}
+
+export function getE(Rx: bigint, P: Point, m: Uint8Array): bigint {
+    return bufferToBigInt(hash(concatBuffers(bufferFromBigInt(Rx), pointToBuffer(P), m))) % secp256k1.n
 }

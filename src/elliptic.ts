@@ -7,7 +7,9 @@ import {
     pointFromBuffer,
     pointToBuffer,
     bufferFromHex,
+    bufferToHex,
 } from './util'
+import * as check from './check'
 import * as assert from 'assert'
 
 const P = curve.p
@@ -16,10 +18,16 @@ export type Scalar = bigint
 
 export const Scalar = {
     fromBytes(buf: Uint8Array): Scalar {
-        return bufferToBigInt(buf)
+        return check.checkPrivkey(bufferToBigInt(buf))
+    },
+    fromHex(hex: string): Scalar {
+        return check.checkPrivkey(bufferToBigInt(bufferFromHex(hex)))
     },
     toBytes(n: Scalar): Uint8Array {
         return bufferFromBigInt(n)
+    },
+    toHex(n: Scalar): string {
+        return bufferToHex(bufferFromBigInt(n))
     },
 }
 
@@ -30,6 +38,7 @@ export interface Point {
 
 export const Point = {
     fromPrivKey(privkey: Scalar): Point {
+        check.checkPrivkey(privkey)
         return pointMultiply(curve.g, privkey)
     },
     fromBytes(buf: Uint8Array): Point {
@@ -37,6 +46,9 @@ export const Point = {
     },
     fromHex(hex: string): Point {
         return Point.fromBytes(bufferFromHex(hex))
+    },
+    toHex(point: Point): string {
+        return bufferToHex(pointToBuffer(point))
     },
     toBytes(point: Point): Uint8Array {
         return pointToBuffer(point)
