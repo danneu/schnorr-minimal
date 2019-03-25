@@ -19,13 +19,11 @@ export class CheckError extends Error {
 // like assert() except it throws CheckError.
 //
 // Use this instead of manually throwing.
-function check(assertion: boolean, message: string) {
+export function check(assertion: boolean, message: string) {
     if (!assertion) {
         throw new CheckError(message)
     }
 }
-
-// TODO: Add redundant runtime checks for users consuming from JS instead of TS.
 
 export function pubkeysAreUnique(pubkeys: Point[]): Point[] {
     // validate runtime type
@@ -34,6 +32,7 @@ export function pubkeysAreUnique(pubkeys: Point[]): Point[] {
     check(pubkeys.length > 0, 'pubkeys array was empty')
     const seen = new Set()
     for (const pubkey of pubkeys) {
+        checkPubkey(pubkey)
         const serialized = JSON.stringify([pubkey.x, pubkey.y])
         check(!seen.has(serialized), 'pubkeys must be unique')
         seen.add(serialized)
@@ -49,6 +48,7 @@ export function privkeysAreUnique(privkeys: Scalar[]): Scalar[] {
     check(privkeys.length > 0, 'privkeys array was empty')
     const seen = new Set()
     for (const privkey of privkeys) {
+        checkPrivkey(privkey)
         const serialized = Scalar.toHex(privkey)
         check(!seen.has(serialized), 'privkeys must be unique')
         seen.add(serialized)

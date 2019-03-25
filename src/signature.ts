@@ -74,6 +74,10 @@ export function verify(pubkey: Point, message: Uint8Array, sig: Signature): bool
         }
     }
 
+    if (sig.r === 0n || sig.s === 0n) {
+        return false
+    }
+
     const m = message
     const P = pubkey
 

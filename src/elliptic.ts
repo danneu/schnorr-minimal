@@ -7,6 +7,7 @@ import {
     bufferToHex,
     curve,
     mod,
+    modInverse,
     pointFromBuffer,
     pointToBuffer,
     powmod,
@@ -43,6 +44,7 @@ export const Point = {
         return pointFromBuffer(buf)
     },
     fromHex(hex: string): Point {
+        assert.strictEqual(hex.length, 66)
         return Point.fromBytes(bufferFromHex(hex))
     },
     toHex(point: Point): string {
@@ -73,9 +75,19 @@ export function scalarMultiply(a: Scalar, b: Scalar): Scalar {
     return (a * b) % curve.n
 }
 
-// export function add(a: Point, b: Point): Point {
-//     return fastAdd(a, b)
-// }
+export function scalarNegate(a: Scalar): Scalar {
+    return (curve.n - a) % curve.n
+}
+
+// scalar^-1 mod N
+export function scalarInverse(a: Scalar): Scalar {
+    return modInverse(a, curve.n)
+}
+
+// POINT MATH
+//
+// TODO: Should point functions propagate INFINITY_POINT
+// instead of failing on x/y access so that callsite can perceive INFINITY_POINT?
 
 export function pointEq(a: Point, b: Point): boolean {
     return a.x === b.x && a.y === b.y

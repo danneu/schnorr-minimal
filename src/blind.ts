@@ -1,16 +1,11 @@
-import * as assert from 'assert'
+import * as check from './check'
 import { Point, pointAdd as add, pointMultiply as mul, scalarAdd, scalarMultiply } from './elliptic'
-import { hash, hmac } from './sha256'
+import { hmac } from './sha256'
 import { Signature } from './signature'
-import {
-    bufferFromBigInt,
-    bufferToBigInt,
-    concatBuffers as concat,
-    curve,
-    jacobi,
-    pointToBuffer,
-    utf8ToBuffer,
-} from './util'
+import { bufferToBigInt, curve, getE, jacobi, pointToBuffer, utf8ToBuffer } from './util'
+
+// A BlindedSignature is a signature that a signer produces at the behest of
+// another party without learning what they have signed.
 
 export type BlindedMessage = { c: bigint /* c = challenge */ }
 export type Unblinder = { alpha: bigint; r: bigint /* R.x */ }
@@ -22,7 +17,7 @@ export function blindMessage(
     signer: Point,
     message: Uint8Array
 ): [Unblinder, BlindedMessage] {
-    assert.strictEqual(message.length, 32, 'message must have 32 length')
+    check.checkMessage(message)
     const R = nonce
     const P = signer
 
@@ -55,7 +50,7 @@ export function blindMessage(
     }
 
     // the challenge
-    const cPrime = bufferToBigInt(hash(concat(bufferFromBigInt(RPrime.x), pointToBuffer(P), message))) % curve.n
+    const cPrime = getE(RPrime.x, P, message)
 
     // the blinded challenge
     const c = scalarAdd(cPrime, beta)

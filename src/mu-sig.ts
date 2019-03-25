@@ -41,9 +41,9 @@ function calculateCoefficient(L: Uint8Array, idx: number): bigint {
 }
 
 // Non-interactive: We must know all signer private keys.
-export function sign(privkeys: Scalar[], message: Uint8Array): Signature {
+export function signNoninteractively(privkeys: Scalar[], message: Uint8Array): Signature {
     assert(privkeys.length > 0, 'must sign with at least one privkey')
-    privkeys.forEach(check.checkPrivkey)
+    check.checkMessage(message)
     check.privkeysAreUnique(privkeys)
 
     const rs = []

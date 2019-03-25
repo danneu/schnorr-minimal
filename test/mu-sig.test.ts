@@ -1,8 +1,7 @@
 import * as assert from 'assert'
-import { muSig, Point, util, verify, Scalar, Signature } from '../src'
-import { hash } from '../src/sha256'
-import * as helpers from './helpers'
+import { muSig, Point, Scalar, Signature, verify } from '../src'
 import { bufferFromHex } from '../src/util'
+import * as helpers from './helpers'
 
 type NodeBipSchnorr_MuSigVector = {
     privkeys: Scalar[]
@@ -17,10 +16,10 @@ const muSigVectors: NodeBipSchnorr_MuSigVector[] = (() => {
     const vectors = []
     for (const o of objs) {
         vectors.push({
-            privkeys: o.privKeys.map(Scalar.fromHex),
-            pubkeys: o.pubKeys.map(Point.fromHex),
-            pubkeyCombined: Point.fromHex(o.pubKeyCombined),
             message: bufferFromHex(o.message),
+            privkeys: o.privKeys.map(Scalar.fromHex),
+            pubkeyCombined: Point.fromHex(o.pubKeyCombined),
+            pubkeys: o.pubKeys.map(Point.fromHex),
             signature: Signature.fromHex(o.signature),
         })
     }
@@ -38,15 +37,14 @@ describe('mu-sig', () => {
             assert.ok(verify(vec.pubkeyCombined, vec.message, vec.signature))
 
             // our sign() signature should verify too
-            const actualSig = muSig.sign(vec.privkeys, vec.message)
+            const actualSig = muSig.signNoninteractively(vec.privkeys, vec.message)
             assert.ok(verify(vec.pubkeyCombined, vec.message, actualSig))
         }
     })
 
-    describe('multi-signer signature', () => {
-        it('does verify', () => {
-            const message = hash(util.utf8ToBuffer('test message'))
-            const privateKeys = (() => {
+    describe('sign', () => {
+        it('can aggregate random qty of random signers', () => {
+            const xs = (() => {
                 const keyQty = helpers.randomInt(1, 100)
                 console.log(`testing with ${keyQty} signers`)
                 const keys = []
@@ -55,31 +53,25 @@ describe('mu-sig', () => {
                 }
                 return keys
             })()
-
-            const pubkeyCombined = muSig.pubkeyCombine(privateKeys.map(Point.fromPrivKey))
-            const signature = muSig.sign(privateKeys, message)
-            assert.ok(verify(pubkeyCombined, message, signature))
+            const Xcom = muSig.pubkeyCombine(xs.map(Point.fromPrivKey))
+            const message = helpers.randomBuffer(32)
+            const signature = muSig.signNoninteractively(xs, message)
+            assert.ok(verify(Xcom, message, signature))
+            assert.ok(!verify(Xcom, helpers.randomBuffer(32), signature))
         })
 
         it('works with single signer', () => {
-            const privkey = helpers.randomPrivkey()
-            const pubkeyCombined = muSig.pubkeyCombine([Point.fromPrivKey(privkey)])
-            const message = hash(util.utf8ToBuffer('hello'))
-            const signature = muSig.sign([privkey], message)
-
-            // Works with combined pubkey
-            assert.ok(verify(pubkeyCombined, message, signature))
-
-            // Does NOT work with uncombined pubkey
-            assert.ok(
-                !verify(Point.fromPrivKey(privkey), message, signature),
-                'un-combined pubkey does not verify mu-sig'
-            )
+            const x1 = helpers.randomPrivkey()
+            const Xcom = muSig.pubkeyCombine([Point.fromPrivKey(x1)])
+            const message = helpers.randomBuffer(32)
+            const signature = muSig.signNoninteractively([x1], message)
+            assert.ok(verify(Xcom, message, signature), 'combined pubkey should verify')
+            assert.ok(!verify(Point.fromPrivKey(x1), message, signature), 'un-combined pubkey should not verify')
         })
 
         it('throws if input collections are empty', () => {
             assert.throws(() => muSig.pubkeyCombine([]))
-            assert.throws(() => muSig.sign([], new Uint8Array()))
+            assert.throws(() => muSig.signNoninteractively([], new Uint8Array()))
         })
     })
 })
